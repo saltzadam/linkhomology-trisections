@@ -1,0 +1,15 @@
+flags: {}
+extra-package-dbs: []
+ghc-options:
+  szabo: -Interactive-print=Text.Pretty.Simple.pPrint
+packages:
+- .
+allow-newer: false
+extra-deps:
+- algebraic-graphs-0.3
+- containers-0.5.11.0
+- binary-0.8.7.0
+
+
+
+resolver: lts-11.22

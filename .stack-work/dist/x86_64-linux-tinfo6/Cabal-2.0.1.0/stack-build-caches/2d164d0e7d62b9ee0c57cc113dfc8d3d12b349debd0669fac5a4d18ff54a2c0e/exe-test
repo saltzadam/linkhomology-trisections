@@ -1,0 +1,156 @@
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/BarNatan.hs:
+  hash: c6e96536e545f88459fc118039902231e76e94f41f6a1a9d5de6705e6661e39c
+  size: 8326
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/Szabo.hs:
+  hash: d2ec5d25fbd9ff720c334e034883cf40e74309e15b322ca09b7078e4e5650dd8
+  size: 3076
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Tangle.hs:
+  hash: 7a5384fb97ac85067b824f8642ba1b2ecaf8d574e42b249b1398a1f83a66d496
+  size: 22413
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/PlanarDiagram.hs:
+  hash: b3794f04cb72dc23a71a829208a4f3e276fbc8e4c8f843041c2df4657606bd46
+  size: 12762
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Configuration.hs:
+  hash: 8db9e5001aa1ee923e9468a83542e99ed42046cd5789261b336191ac2782d8c5
+  size: 23415
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/Closure2.hs:
+  hash: 40ec090f331aa57aab9e22c349763d04c2c5ab2efb07b6fa14ede05893946011
+  size: 13083
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/szabo.cabal:
+  hash: 679ed1e2308fb5c847485eea5bbdced9fd112a0320f4de0cd73b968be79e5933
+  size: 4029
+  modtime: 1581035651
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Cube.hs:
+  hash: 96f6b6eb5f9c2ad06fbde89b5f97f236d21c063e3c0d039563885860dd902ad7
+  size: 3345
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/ChangeLog.md:
+  hash: 188f305fdc5f6b1ca8102f0f24652489a4d2f6e466087093fe02c8fa0efd9008
+  size: 109
+  modtime: 1581035455
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Util.hs:
+  hash: 34d38f68122c65749025d568ad9c752c097519c77c1a8f1e1f044fd02eba476c
+  size: 10741
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Complex/BuildCube.hs:
+  hash: d928dfe1b85bdf254bd46300fbd4dbcf51cc4204080f14d154ad20f64d505791
+  size: 3073
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/Tester.hs:
+  hash: d4e98b52b1b7ccb7b64b32949c896b742fe008492c9038fce6a51fd94756590a
+  size: 14311
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/NewE.hs:
+  hash: 0a313a3af2760cc399cba06805f48bd3d3f1599e0402ff5a84f689a6a247986b
+  size: 6730
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/Closure1.hs:
+  hash: 20178bd0ba3e375826a1e2202da6fcf563c50cd91027bf93dd8f5e85eee79f17
+  size: 9231
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Algebra/V.hs:
+  hash: 1e9cfd87c12a827d45e4dbfbe8403c041f1acb360b0176c218d389a8c8a121b5
+  size: 2996
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Resolution.hs:
+  hash: 9c0712c2028f8b1c7c66a8c6652f15b3c237c28f0fd84f0e3ec050b3b12e99ed
+  size: 1589
+  modtime: 1581035367
+/usr/include/stdc-predef.h:
+  hash: 2e86550497437ec45c60c22ca663262607b5da3d5e4d3aed7f8a9aaa0f7577c0
+  size: 2289
+  modtime: 1573661792
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/CubeUtil.hs:
+  hash: f330b700e5bc3abd59c6f38a2d900b4ce55d18d6fa3badb60e57419f35dba000
+  size: 1371
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/Configuration.hs:
+  hash: 3360b0e98d7c40dac2d56422bf8136e37a5d29d3c0b4d031461f038a8ad80b86
+  size: 949
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Algebra/Z2.hs:
+  hash: 514331791234f37e26c83ff84b2d4aa1893aed513d213b5957b1579e36b749e0
+  size: 1111
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/TypeE.hs:
+  hash: ef96095311cc628dad9a2d7c7cbf5e911583d0622d9a4e0b27a075ec975fdac2
+  size: 6850
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Draw.hs:
+  hash: ef8f4db2758517caeb426d3b0d0cfc754a99caf0725615c62205d12e452b714b
+  size: 5041
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Complex/Hyperbox.hs:
+  hash: dc3633c5c89fd70d9dc2c694563266acb2f1c440172e7b2e70698db09b212102
+  size: 11455
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Grid.hs:
+  hash: 93ebdb564532f5d527b9fb4db1dd8844d8f19a74ff418c73d340389dad17a1e8
+  size: 11579
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/SSS.hs:
+  hash: 3402ebe43f8b0271cecd0001de3dd8083d6faddb24ccd714fecf82666269e582
+  size: 546
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Main.hs:
+  hash: 2adbf8a3631d14765263913e2aced7b418d9a3e50e71569a69b49ea4502498cd
+  size: 3933
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/Braids.hs:
+  hash: e643960465d6db3ecfcb627672d9ecceca6b4fa6d3b7258496006e313eeed369
+  size: 4834
+  modtime: 1581035367
+? /home/adam/Dropbox/haskell/linkhomology-trisections/.stack-work/dist/x86_64-linux-tinfo6/Cabal-2.0.1.0/build/test/autogen/cabal_macros.h
+: hash: c3dfb5669da42d002942ba223ed8a701f7f9013bf6c09dc4ddd6ba319b5123a4
+  size: 8428
+  modtime: 1581035533
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/TypeCD.hs:
+  hash: 1024660a36274c9aff5e990f88ecf6ec264f91de2186dc742e685515828ced0d
+  size: 1342
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/ReidemeisterTwo.hs:
+  hash: b4f18778ff5fac3a7508c9fc56d3943bc7698497de882e56caa5aa92b36a682d
+  size: 2550
+  modtime: 1581035367
+/home/adam/.stack/programs/x86_64-linux/ghc-tinfo6-8.2.2/lib/ghc-8.2.2/include/ghcversion.h:
+  hash: e803b62244dbe2a2413f5c2cd68110a5cc21f1167bc36e77db7c55974024764b
+  size: 524
+  modtime: 1553117932
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/Closure3.hs:
+  hash: 3588dfcaf2c3b66ce137224296c5b2ddb5228dac2977a066ed7cd2ca79be0ba7
+  size: 17084
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Core/PlanarDiagram/Operations.hs:
+  hash: 0e2e4236617b081d1d928fa37e456beb8d120a94f4e0c9887f732c9250f21bb5
+  size: 100
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/Tree.hs:
+  hash: 4f66a2dc3cf9acfcc840913341efc37d3560c1a0299fe57b2acb7456c0a65c0d
+  size: 1011
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/Cobordism.hs:
+  hash: a73749d4e498d73175f05453133a960ecf34727dfa2eaf8e0c859a8988849792
+  size: 6637
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Complex/Homology.hs:
+  hash: 98bc61a922f415f0d3c4281f27054e3c3fefa508c097cc742d45cb0ea564c317
+  size: 6683
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Eg/Eg.hs:
+  hash: 8347788e564a69c4d1bfefe3885f37f65737f6291aa73527163703be263d778a
+  size: 2236
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/LinkHomology/LinkHomology.hs:
+  hash: 761aef8375b1bab406ed4955f55d63507f35025004e66552128501f9a979173e
+  size: 3880
+  modtime: 1581035367
+/home/adam/Dropbox/haskell/linkhomology-trisections/src/Classification/Classification.hs:
+  hash: 1548d0fac5681d231018f96e84d79ef63b06cee3cf18eb2020a6b84ad5288502
+  size: 4056
+  modtime: 1581035367

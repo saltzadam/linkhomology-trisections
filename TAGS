@@ -1,0 +1,267 @@
+
+./Setup.hs,15
+main main1,2
+
+./src/Algebra/V.hs,370
+module Algebra.VAlgebra.V0,1
+newtype Labeling Labeling13,14
+newtype Labeling = Labeling {getLabeling getLabeling13,14
+type KhovanovGroup KhovanovGroup15,16
+instance Monoid Monoid Labeling17,18
+    mempty mempty18,19
+    mappend mappend19,20
+generateLabelings generateLabelings24,25
+buildKhovanovGroup buildKhovanovGroup30,31
+makeLabel makeLabel33,34
+
+./src/Algebra/Z2.hs,447
+module Algebra.Z2Algebra.Z20,1
+data Z2 Z28,9
+data Z2 = ZZero ZZero8,9
+data Z2 = ZZero | ZOne ZOne8,9
+instance Num Num Z210,11
+    (+(+)11,12
+    (*(*)14,15
+    negate negate17,18
+    signum signum18,19
+    abs abs19,20
+    fromInteger fromInteger20,21
+instance Show Show Z224,25
+    show show25,26
+z2ToInt z2ToInt28,29
+mod2addS mod2addS33,34
+mod2addL mod2addL38,39
+mod2NEL mod2NEL43,44
+nelDelete nelDelete48,49
+
+./src/Complex/BuildCube.hs,395
+module Complex.BuildCubeComplex.BuildCube0,1
+getAllZeroesConfig getAllZeroesConfig20,21
+getDecs getDecs28,29
+decMap decMap33,34
+getConfigFromPD getConfigFromPD36,37
+getConfigFromConf getConfigFromConf46,47
+classifyAndShow classifyAndShow52,53
+generateEdges generateEdges66,67
+generateEdges' generateEdges'72,73
+generateEdges'' generateEdges''76,77
+higherRes higherRes83,84
+
+./src/Complex/Homology.hs,142
+module Complex.HomologyComplex.Homology0,1
+homology' homology'13,14
+homology homology21,22
+poincarePolynomial poincarePolynomial24,25
+
+./src/KhovanovSzabo/Khovanov.hs,762
+module KhovanovSzabo.KhovanovKhovanovSzabo.Khovanov1,2
+khovanovCobordismMap khovanovCobordismMap29,30
+data DecorationMap DecorationMap35,36
+data DecorationMap = DecorationMap DecorationMap35,36
+data DecorationMap = DecorationMap { action action35,36
+applyAction applyAction38,39
+replaceLabels replaceLabels41,42
+replaceSubMap replaceSubMap50,51
+replaceSubMapKeys replaceSubMapKeys56,57
+biggestPlus biggestPlus61,62
+smallestPlus smallestPlus66,67
+split split71,72
+merge merge85,86
+khovanovCube khovanovCube102,103
+tempGroup tempGroup131,132
+tempCubeOfMaps tempCubeOfMaps133,134
+khHomGrading khHomGrading143,144
+khQGrading khQGrading146,147
+khPoincarePoly khPoincarePoly151,152
+ckhRank ckhRank154,155
+khRank khRank157,158
+
+./src/Core/CrossinglessMatchings.hs,969
+module Core.CrossinglessMatchingsCore.CrossinglessMatchings0,1
+newtype Pair Pair6,7
+instance Eq Eq a => Eq (Pair a)7,8
+    (=(==)8,9
+instance Ord Ord a => Ord (Pair a)10,11
+    (<(<=)11,12
+instance Show Show a => Show (Pair a)13,14
+    show show14,15
+makePair makePair16,17
+sortP sortP19,20
+data PairComparison PairComparison22,23
+data PairComparison a = NestedIn NestedIn22,23
+data PairComparison a = NestedIn (Pair a) (Pair a) | Disjoint Disjoint22,23
+data PairComparison a = NestedIn (Pair a) (Pair a) | Disjoint | CrossingCrossing22,23
+comparePair comparePair24,25
+doesNotCross doesNotCross31,32
+data CrossinglessMatchings CrossinglessMatchings37,38
+data CrossinglessMatchings a = CrossinglessMatching CrossinglessMatching37,38
+type CM CM39,40
+getPairs getPairs41,42
+endpointList endpointList44,45
+cm cm47,48
+isCM isCM54,55
+cmN cmN60,61
+pairs pairs64,65
+none none71,72
+choose choose74,75
+catalan catalan77,78
+
+./src/Core/Cube.hs,357
+module Core.Cube(Core.Cube3,4
+intCube intCube29,30
+data CubeOf CubeOf32,33
+data CubeOf a b = Cube Cube32,33
+                          vertices vertices33,34
+                        , arrows arrows34,35
+nullDifferential nullDifferential37,38
+rank rank40,41
+euler euler43,44
+showPoly showPoly47,48
+cubePoincarePoly cubePoincarePoly62,63
+
+./src/Core/Draw.hs,198
+module Core.DrawCore.Draw1,2
+drawPD' drawPD'8,9
+draw draw11,12
+draw' draw'14,15
+drawNode drawNode17,18
+drawDeco drawDeco22,23
+drawConfig drawConfig25,26
+drawConfig' drawConfig'31,32
+
+./src/Core/Cobordism.hs,330
+module Core.CobordismCore.Cobordism0,1
+data BasicCobordism' BasicCobordism'10,11
+data BasicCobordism' a = Merge Merge10,11
+data BasicCobordism' a = Merge a a a | Split Split10,11
+type BasicCobordism BasicCobordism11,12
+decoToCobordism decoToCobordism13,14
+findDecoration findDecoration29,30
+findNode findNode32,33
+
+./src/Core/CubeUtil.hs,730
+module Core.CubeUtilCore.CubeUtil0,1
+safeHeadMap safeHeadMap17,18
+onArrows onArrows20,21
+onAllTargetsPrune onAllTargetsPrune23,24
+pruneArrows pruneArrows28,29
+nullFunction nullFunction31,32
+data Edge Edge34,35
+data Edge a b = Edge Edge34,35
+data Edge a b = Edge { source source34,35
+                       target target35,36
+nelDelete nelDelete38,39
+deleteVertex deleteVertex41,42
+sourceTo sourceTo48,49
+findSourcesTo' findSourcesTo'51,52
+findSourcesTo findSourcesTo58,59
+findTargetsFrom findTargetsFrom63,64
+cubeElem cubeElem69,70
+insertEdge insertEdge72,73
+getAnEdge getAnEdge80,81
+getATarget getATarget83,84
+findIt findIt88,89
+cancelEdge cancelEdge97,98
+invertMap invertMap108,109
+
+./src/Core/Grid.hs,2146
+module Core.Grid(Core.Grid1,2
+data Point' Point'27,28
+data Point' a = Point Point27,28
+_x _x30,31
+_y _y32,33
+shiftXBy shiftXBy35,36
+shiftYBy shiftYBy37,38
+type Edge Edge40,41
+data TwoByTwoMatrix TwoByTwoMatrix42,43
+data TwoByTwoMatrix a = Mat Mat42,43
+determinant determinant44,45
+divideMatBy divideMatBy47,48
+invert invert50,51
+vecToPoint vecToPoint55,56
+mulVec mulVec58,59
+findIntersection findIntersection62,63
+data SideData SideData86,87
+data SideData = SameSide SameSide86,87
+data SideData = SameSide | DifferentSigns DifferentSigns86,87
+data SideData = SameSide | DifferentSigns | Colinear Colinear86,87
+onSameSide onSameSide88,89
+findOtherVertex findOtherVertex103,104
+differenceOfPoints differenceOfPoints108,109
+data TwoVec TwoVec111,112
+data TwoVec a = Vec Vec111,112
+dotProduct dotProduct113,114
+norm norm116,117
+farthest farthest119,120
+distance distance122,123
+data ThreePointStrand ThreePointStrand125,126
+data ThreePointStrand = TPS TPS125,126
+data Orientation Orientation127,128
+data Orientation = CW CW127,128
+data Orientation = CW | CCW CCW127,128
+opposite opposite128,129
+checkDirection checkDirection132,133
+parseToTPS parseToTPS135,136
+checkDirection' checkDirection'142,143
+data GridPic GridPic163,164
+data GridPic = GridPic GridPic163,164
+data GridPic = GridPic {points points163,164
+                        edges edges164,165
+                        edgeToEdge edgeToEdge165,166
+instance Show Show GridPic167,168
+    show show168,169
+instance Monoid Monoid GridPic170,171
+    mappend mappend171,172
+    mempty mempty172,173
+stringToGrid stringToGrid174,175
+buildGridPic buildGridPic204,205
+data LineColor LineColor207,208
+data LineColor = None None207,208
+data LineColor = None | Red Red207,208
+instance Show Show LineColor208,209
+    show show209,210
+data LineType LineType211,212
+data LineType = Up' Up'211,212
+data LineType = Up' | Down' Down'211,212
+data LineType = Up' | Down' | Left' Left'211,212
+data LineType = Up' | Down' | Left' | Right' Right'211,212
+sh' sh'212,213
+center center254,255
+
+./src/Core/Resolution.hs,513
+module Core.ResolutionCore.Resolution0,1
+data Resolution' Resolution'4,5
+data Resolution' = ZeroR ZeroR4,5
+data Resolution' = ZeroR | OneR OneR4,5
+instance Num Num Resolution'5,6
+    x x6,7
+    ZeroR ZeroR7,8
+    OneR OneR8,9
+    ZeroR ZeroR10,11
+    _ _11,12
+    x x12,13
+    fromInteger fromInteger14,15
+    negate negate15,16
+    abs abs16,17
+    signum signum17,18
+instance Show Show Resolution'20,21
+    show show21,22
+weight weight24,25
+type Resolution Resolution30,31
+
+./src/Core/Braids.hs,409
+module Core.BraidsCore.Braids1,2
+data Braid Braid18,19
+data Braid = Braid Braid18,19
+data Braid = Braid { braidWidth braidWidth18,19
+                   , braidWord braidWord19,20
+bridgeNumber bridgeNumber22,23
+parse parse26,27
+platClosure platClosure44,45
+platTop platTop54,55
+platBottom platBottom63,64
+platCube platCube75,76
+mirror mirror81,82
+crossingToNodes crossingToNodes87,88
+
+./
