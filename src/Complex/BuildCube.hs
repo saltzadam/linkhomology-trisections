@@ -1,6 +1,17 @@
+{-|
+Module      : Complex.BuildCube
+Description : Builds a chain complex
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+-}
 module Complex.BuildCube
-  ( subconfigurations
-  , cubeOfConfigurations
+  (
+   cubeOfConfigurations,
+   subconfigurations
   )
 where
 import           Core.Configuration
@@ -16,33 +27,11 @@ import           Data.List                      ( delete
 import           Data.Map.Lazy                ( Map )
 import qualified Data.Map.Lazy               as M
 
--- generates non-empty subconfigurations
+-- | Generates non-empty subconfigurations of a 'Configuration'.  Needed for 'cubeOfConfigurations' and useful elsewhere.
 subconfigurations :: Configuration -> [Configuration]
 subconfigurations (Configuration pd decs c _) =
   fmap (\ds -> Configuration pd ds c (activeGraph pd ds)) (nonemptySubsets decs)
 
--- this is what we actually need!
--- start with a resolution and configuration at that resolution
--- relevantDecs takes two resolutions and tells you which decorations you need to get from one to the other
--- the output tells you what configurations go from res to tarRes
-{-generateEdges''
-  :: Resolution
-  -> Configuration
-  -> Map Resolution (Set Decoration)
-  -> Map Resolution Configuration
-generateEdges'' res conf decoMap = graphMap
-  (\r -> replaceDecos conf (relevantDecs res r decoMap))
-  (greaterRes res)
- where
-  replaceDecos (Configuration pd _ c g) ds = Configuration pd ds c g
-  relevantDecs
-    :: Resolution
-    -> Resolution
-    -> Map Resolution (Set Decoration)
-    -> Set Decoration
-  relevantDecs res' tarRes decMap' =
-    (decMap' M.! tarRes) `S.difference` (decMap' M.! res')
--}
 greaterRes :: Resolution -> [Resolution]
 greaterRes res = delete res (go res)
  where
@@ -72,6 +61,10 @@ addMorphisms0 f theMap = CubeOf $ M.fromList
 
 -- this is oriented
 -- remove 0-dimensional configs!
+-- | Builds the cube of configurations for a knot diagram.
+-- This (and the 'Classification' modules) are the endpoints of our topological computations.
+--
+-- The cube of configurations has 'DecoratedResolvedDiagram's at each vertex and 'Configuration's along edges.
 cubeOfConfigurations
   :: CrossPD -> CubeOf Resolution DecoratedResolvedDiagram Configuration
 cubeOfConfigurations pd =

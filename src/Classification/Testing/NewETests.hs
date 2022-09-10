@@ -1,3 +1,14 @@
+{-|
+Module      : Classification.Testing.NewETests
+Description : Test for the Type E classification scheme
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Tests for the Type E classification scheme.  TODO: put into a proper test suite.
+-}
 module Classification.Testing.NewETests
   where
 import Classification.NewE
@@ -5,6 +16,7 @@ import Core.Configuration
 import Classification.Tester
 import Data.Maybe (fromJust)
 
+-- * Example two-dimensional configurations
 szabo1 :: TwoDConf
 szabo1 = (fromJust . confToTwoDConf . fromPic)  szabo1String
 szabo1' :: TwoDConf
@@ -38,6 +50,7 @@ szabo7 = (fromJust . confToTwoDConf . fromPic)  szabo7String
 szabo7' :: TwoDConf
 szabo7' = (fromJust . confToTwoDConf . fromPic)  szabo7String'
 
+-- ** Reverse of the above configurations
 szabo1r :: TwoDConf
 szabo1r = (fromJust .  confToTwoDConf . reverseConfig . fromPic)  szabo1String
 szabo1r' :: TwoDConf
@@ -71,6 +84,7 @@ szabo7r = (fromJust .  confToTwoDConf . reverseConfig . fromPic)  szabo7String
 szabo7r' :: TwoDConf
 szabo7r' = (fromJust .  confToTwoDConf . reverseConfig . fromPic)  szabo7String'
 
+-- * The tests
 testNewE :: TwoDConf -> [Bool]
 testNewE c = ($ c) <$> [isType23, isType4, isType5, isType67away, isType67towards]
 
@@ -109,6 +123,7 @@ newTestsReversed = [testNewE szabo1r  == [False, False,False,False,False],
             testNewE szabo7r == [False,False,False,True,False] || (testNewE szabo7r )== [False,False,False,False,True],
             testNewE szabo7r' == [False,False,False,True,False] || (testNewE szabo7r') == [False,False,False,False,True]]
 
+-- | A two-dimensional configurations of type 2 - 7 is "ruined" if you reverse one of the decorations -- it won't be of that type any more.  This tests that the "ruined" decorations are properly classified as such. 
 newTestsRuined :: [Bool]
 newTestsRuined = let allFalse = [False,False,False,False,False]
   in
@@ -120,7 +135,7 @@ newTestsReversedRuined = let allFalse = [False,False,False,False,False]
     fmap ((== allFalse)  . (testNewE . ruin)) [szabo1r,szabo2r,szabo2r',szabo2r'',szabo3r,szabo3r',szabo4r,szabo4r',szabo4r'',szabo4r''',szabo5r,szabo6r,szabo6r',szabo7r,szabo7r']
 
 
-
+-- * String pictures for the test configurations.
 szabo1String :: String
 szabo1String  =  ".-.-. .-.-.\n\
                   \|   |>|   |\n\

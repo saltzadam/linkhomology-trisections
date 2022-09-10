@@ -1,3 +1,14 @@
+{-|
+Module      : Complex.Homology
+Description : Compute the homology of a chain complex
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Computes the homology of a (filtered) chain complex over Z/2Z.  Uses the "cancellation algorithm."  Upgrading this to work over another ring would be tricky!
+-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Complex.Homology
 -- (homology)
@@ -12,9 +23,8 @@ import           Data.Set                       ( Set )
 import qualified Data.Set                      as S
 import           Data.Maybe                     ( listToMaybe )
 
--- what should this have?
-newtype HomologyOptions = HO {i :: Int}
-
+-- * Homology
+-- | The homology of a filtered chain complex can be computed in steps by walking through the filtration.  Each step is called a page.  (The sum of the pages is a "spectral sequence.")  'homologyPage' computes a particular page.
 homologyPage
   :: (Show d, Ord d)
   => LinearCubeOfResolutions d
@@ -24,6 +34,7 @@ homologyPage cube page =
   -- let pruned = CubeOf (pruneMap . arrows $ cube) in
   if M.null (arrows cube) then cube else homology'' 1 page cube
 
+-- | Compute the full homology of a chain complex.
 homology
   :: (Ord o, Show o) => LinearCubeOfResolutions o -> LinearCubeOfResolutions o
 homology cube =
@@ -31,10 +42,11 @@ homology cube =
                                                           -- pruned  = CubeOf  (pruneMap . arrows $ cube)
   in  if M.null (arrows cube) then cube else homology'' 1 maxStep cube -- TODO: do we need this condition?
 
+-- | 'homology' works by applying 'homology\'\''.  Cancels arrows on the current page until it runs out of arrows, then moves onto the next page.  Stops at the maximum page.
 homology''
   :: (Ord o, Show o)
-  => Int
-  -> Int
+  => Int -- ^ current page 
+  -> Int -- ^ maximum page
   -> LinearCubeOfResolutions o
   -> LinearCubeOfResolutions o
 homology'' step maxStep cube = if step > maxStep
@@ -44,28 +56,39 @@ homology'' step maxStep cube = if step > maxStep
       let cube' = cancelArrow arr cube in homology'' step maxStep cube'
     Nothing -> homology'' (step + 1) maxStep cube
 
+-- | Computes the length of the filtration of a filtered complex.
 maxLen :: LinearCubeOfResolutions o -> Int
 maxLen = (+ 2) . length . head . M.keys . chainGroup -- TODO: should this have (2^)?
 
+-- | Removes null sets from the 'LinearCubeOf'.
 pruneCube :: LinearCubeOf i o -> LinearCubeOf i o
 pruneCube = amap (fmap (fmap (M.filter (not . S.null))))
 
+-- * Arrows
 -- cube is now
 -- Map resolution (Map object (Map resolution (Set object)))
+-- | An 'Arrow' goes from one 'Resolution' and object to another.
 type Arrow o = (Resolution, o, Resolution, o)
+-- | Get the source of an arrow.
 source :: Arrow o -> (Resolution, o)
 source (r, o, _, _) = (r, o)
+-- | Get the target of an arrow.
 target :: Arrow o -> (Resolution, o)
 target (_, _, r', o') = (r', o')
+-- | Get the target resolution of an arrow.
 targetR :: Arrow o -> Resolution
 targetR = fst . target
+-- | Get the target object of an arrow.
 targetG :: Arrow o -> o
 targetG = snd . target
+-- | Get the source resolution of an arrow.
 sourceR :: Arrow o -> Resolution
 sourceR = fst . source
+-- | Get the source object of an arrow.
 sourceG :: Arrow o -> o
 sourceG = snd . target
 
+-- | Returns the total number of targets of all arrows.  Useful for making sure the cancellation algorithm is properly implement: each step should reduce 'arrowRank' by two.
 arrowRank :: LinearCubeOfResolutions o -> Int
 arrowRank =
   sum
@@ -75,15 +98,9 @@ arrowRank =
     . M.elems
     . arrows
 
-getAnArrowHGrading :: LinearCubeOfResolutions o -> Int -> Maybe (Arrow o)
-getAnArrowHGrading c len =
-  getAnArrowGrading (\r _ r' _ -> weight r' - weight r <= len) c
-
-getAnArrowNoGrading :: LinearCubeOfResolutions o -> Maybe (Arrow o)
-getAnArrowNoGrading = getAnArrowGrading (\_ _ _ _ -> True)
-
+-- | Returns an arrow which satisfies some condition, presumably a grading.
 getAnArrowGrading
-  :: (Resolution -> o -> Resolution -> o -> Bool)
+  :: (Resolution -> o -> Resolution -> o -> Bool) -- ^ the grading condition
   -> LinearCubeOfResolutions o
   -> Maybe (Arrow o)
 getAnArrowGrading g c = do
@@ -111,6 +128,18 @@ getAnArrowGrading g c = do
     . fmap (fmap (listToMaybe . S.toList))
     $ m3
 
+-- | Returns an arrow of the proper homological grading.
+getAnArrowHGrading :: LinearCubeOfResolutions o -> Int -> Maybe (Arrow o)
+getAnArrowHGrading c len =
+  getAnArrowGrading (\r _ r' _ -> weight r' - weight r <= len) c
+
+-- | Returns some arrow.
+getAnArrowNoGrading :: LinearCubeOfResolutions o -> Maybe (Arrow o)
+getAnArrowNoGrading = getAnArrowGrading (\_ _ _ _ -> True)
+
+-- * The cancellation algorithm
+
+-- | "Cancel" an arrow according to the cancellation algorithm.
 cancelArrow
   :: (Ord o)
   => Arrow o
@@ -146,8 +175,7 @@ cancelArrow arr = if source arr == target arr
             M.singleton x (M.singleton y (M.singleton z (S.singleton w)))
       in  addArrowsMod2s . fmap makeMap $ ll
 
-
-
+-- | Get all the arrows pointing to a @(Resolution, object)@.
 arrowsTo
   :: Ord o => LinearCubeOfResolutions o -> (Resolution, o) -> Set (Arrow o)
 arrowsTo c (index, object) =
@@ -164,6 +192,7 @@ arrowsTo c (index, object) =
     . M.filterWithKey (\r _ -> weight r < weight index)  -- only include stuff with lower index
     $ arrows c
 
+-- | Get all the arrows pointing from a @(Resolution, object)@.
 arrowsFrom
   :: (Ord o) => LinearCubeOfResolutions o -> (Resolution, o) -> Set (Arrow o)
 arrowsFrom c (index, object) =
@@ -182,6 +211,7 @@ arrowsFrom c (index, object) =
   setMaybe (Just os) = os
   setMaybe Nothing   = S.empty
 
+-- | Delete an object from a 'LinearCubeOfResolutions'.  Deletes all arrows two and from the object.
 deleteObjectAt
   :: (Ord o)
   => LinearCubeOfResolutions o
@@ -199,3 +229,8 @@ deleteObjectAt cube (ind, obj) = LinearCubeOf
 
 -- prune :: LinearCubeOfResolutions o -> LinearCubeOfResolutions o
 -- prune c = c { arrows = pruneMap $ (arrows c) }
+
+-- what should this have?
+newtype HomologyOptions = HO {i :: Int}
+
+

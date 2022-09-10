@@ -1,3 +1,14 @@
+{-|
+Module      : Complex.Hyperbox
+Description : Working with hyperboxes
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Implements hyperboxes, a linear-algebraic (or homological-algebraic?) device due to Manolescu and Ozsvath (LINK).  These aren't necessary for computing link homology theories, but are for working with bridge trisections.
+-}
 module Complex.Hyperbox where
 import           Algebra.Z2
 import           Data.Map.Lazy ( Map )
@@ -19,21 +30,25 @@ import           Core.Resolution
 import           Algebra.V
 import           Control.Applicative            ( liftA2 )
 
--- probably should be vectors
+-- * Hyperboxes
+
+-- | 'Delta' marks coordinates, 'Epsilon' represents steps from one coordinate to another.
 type Delta = [Int]
 type Epsilon = [Z2]
 
+-- | Move from one 'Delta' to another via 'Epsilon'.
 addDE :: Delta -> Epsilon -> Delta
 d `addDE` e = zipWith (+) d (fmap z2ToInt e)
 
-
+-- | A hyperbox with objects of type @object@ and morphisms of type @morphism@.  The @vertices@ are the underlying vector space.  @arrowsH@ is the self-map.
 data Hyperbox object morphism = Hyperbox {vertices :: Map Delta object,
                                             arrowsH :: Map (Delta, Epsilon) morphism} deriving (Eq, Ord, Show)
 
+-- | Build a hyperbox.
 buildHyperbox
-  :: (Delta -> object)
-  -> ((Delta, Epsilon) -> morphism)
-  -> Delta
+  :: (Delta -> object) -- ^ builds the objects
+  -> ((Delta, Epsilon) -> morphism) -- ^ builds the morphisms
+  -> Delta -- ^ size
   -> Hyperbox object morphism
 buildHyperbox f g d = Hyperbox (graphMapPar f (upTo d)) (graphMapPar g pog)
  where
@@ -45,7 +60,12 @@ buildHyperbox f g d = Hyperbox (graphMapPar f (upTo d)) (graphMapPar g pog)
   allLTE []       []       = True
   allLTE _        _        = False
 
+-- By "instantiate" I mean "convert @Labeling -> Set Labeling@ into a finite function so we can work with it."
+instantiateH :: Hyperbox (Set Labeling) (Labeling -> Set Labeling)-> Hyperbox (Set Labeling) (Map Labeling (Set Labeling))
+instantiateH hyperbox =  hyperbox {arrowsH = M.mapWithKey (\(d,_) f -> graphMap f (S.toList $ vertices hyperbox M.! d)) . arrowsH $ hyperbox}
 
+-- * Compression
+-- | In some sense, this function is the goal of the module.  We want to build hyperboxes, compress them, and get the morphism across the "long diagonal."
 diagonalMap :: Ring m => Hyperbox o m -> m
 diagonalMap h = (M.! (dd, ee)) $ arrowsH (compress h)
  where
@@ -53,7 +73,7 @@ diagonalMap h = (M.! (dd, ee)) $ arrowsH (compress h)
   dd = replicate l 0
   ee = replicate l ZOne
 
-
+-- | Specializes 'diagonalMap' but returns @o -> Set o@.
 diagonalMapSet :: Ord o => Hyperbox (Set o) (Map o (Set o)) -> (o -> Set o)
 diagonalMapSet h = \object ->
   maybeSet . M.lookup object . (M.! (dd, ee)) $ arrowsH (compress h)
@@ -65,9 +85,27 @@ diagonalMapSet h = \object ->
   maybeSet (Just xs) = xs
   maybeSet Nothing   = S.empty
 
-instantiateH :: Hyperbox (Set Labeling) (Labeling -> Set Labeling)-> Hyperbox (Set Labeling) (Map Labeling (Set Labeling))
-instantiateH hyperbox =  hyperbox {arrowsH = M.mapWithKey (\(d,_) f -> graphMap f (S.toList $ vertices hyperbox M.! d)) . arrowsH $ hyperbox}
+-- | Compress a hyperbox.  The remaining functions are helpers to 'compress'.
+compress :: Ring m => Hyperbox o m -> Hyperbox o m
+compress hyperbox = compose
+  (fmap (flip compressAxis) . reverse $ [0 .. dimension hyperbox - 1])
+  hyperbox
 
+-- | Compress a hyperbox along a particular axis.
+compressAxis :: Ring m => Hyperbox o m -> Int -> Hyperbox o m
+compressAxis hyperbox axis =
+  fixIndices axis . mapToHyperbox . compressAlong axis $ decomposeAlongAxis hyperbox axis
+ where
+    -- makes dn into 1
+  compressAlong :: Ring m => Int -> NE.NonEmpty (MapOfHyperboxes o m) -> MapOfHyperboxes o m
+  compressAlong _ ((NE.:|) h []) = h
+  compressAlong axis' hs = let hs' = reverse $ NE.toList hs
+                           in compose (fmap (composeAlong axis')  (init hs')) (last hs') -- checked length above
+  -- decomposeAlongAxis gives [first slice,second slice,...]
+  -- we reverse that into [last slice, ..., second slice, first slice]
+  -- 
+
+-- | Takes a hyperbox which is known to have size one in all dimensions into a cubical chain complex.  Does not check the size!
 hyperCubeToCube
   :: Hyperbox (Set Labeling) (Labeling -> Set Labeling)
   -> CubeOf Resolution Labeling (Labeling -> Set Labeling)
@@ -101,7 +139,58 @@ hyperCubeToCube hyp = CubeOf lvl3
   epsDiff d2 d1 = ((fromInteger . toInteger) :: Int -> Z2)
     <$> zipWith subtract (fmap why d2) (fmap why d1)
 
+-- ** Maps of hyperboxes
 
+-- this is like a hyperbox whose shape is guaranteed
+-- | A morphism of hyperboxes is itself a hyperbox.  The last dimension of that box has length 1, so the box is the sum of @hZero@ and @hOne@.  @theMap@ consists of arrows between those two pieces.
+data MapOfHyperboxes object morphism = MapOfHyperboxes {hZero :: Hyperbox object morphism,
+                                                        hOne :: Hyperbox object morphism,
+                                                        theMap :: Map (Delta, Epsilon) morphism}
+
+
+-- axis will be the axis of the NEW stuff
+-- remember that axes and insertAt both start at 0
+-- assumes that all parts already 'know' which axis they belng on
+mapToHyperbox :: MapOfHyperboxes o m -> Hyperbox o m
+mapToHyperbox m = Hyperbox (M.union (vertices m0) (vertices m1)) arrows''
+ where
+  m0       = hZero m
+  m1       = hOne m
+  arrows'' = arrowsH m0 `M.union` arrowsH m1 `M.union` theMap m 
+
+-- | Maps of hyperboxes are composed by stacking them along their last axis, then compressing along that axis.  Just in case, 'composeAlong' lets you choose the axis.
+composeAlong
+  :: Ring morphism => Int -- ^ axis along which to compose
+     -> MapOfHyperboxes object morphism
+     -> MapOfHyperboxes object morphism
+     -> MapOfHyperboxes object morphism
+composeAlong axis' m' m = MapOfHyperboxes (hZero m) (hOne m') (composeDeltaEpsilonMap axis' (theMap m') (theMap m))
+
+-- should compose as functions!
+-- | Composes maps parametrized by @(Delta, Epsilon)@.
+composeDeltaEpsilonMap
+  :: (Ring morphism) => Int
+  -> Map (Delta, Epsilon) morphism
+  -> Map (Delta, Epsilon) morphism
+  -> Map (Delta, Epsilon) morphism
+composeDeltaEpsilonMap axis m' m = graphMap (uncurry newMorphism) . M.keys $ m
+-- it is weird that m' doesn't appear directly in the definition but that's because it appears below
+ where
+  newMorphism delta eps =
+    rconcat . catMaybes . fmap (ePsToMap m' m axis delta) $ decompose eps
+  decompose eps = if eps !! axis == ZZero
+                  then [] -- if eps isn't maplike then it contributes nothing
+                  else decomposeZ2Sum . replaceAt axis SumTwo . fmap singleToSum $ eps
+
+-- | To compress a hyperbox, we think of it as a map of hyperboxes, then compose those maps.  'decomposeAlongAxis' does this for an axis.
+decomposeAlongAxis
+  :: Hyperbox object morphism
+  -> Int -- ^ axis
+  -> NonEmpty (MapOfHyperboxes object morphism)
+decomposeAlongAxis h axis =
+   NE.fromList . reverse $ unfoldr (splitOffLastAlongAxis axis) h
+   -- this gives [first map, second map, ...]
+-- * Helpers
 upTo :: Delta -> [Delta]
 upTo [d     ] = fmap (: []) [0 .. d]
 upTo (d : ds) = [ i : ds' | ds' <- upTo ds, i <- [0 .. d] ]
@@ -121,11 +210,6 @@ shape = last . M.keys . vertices
 dimension :: Hyperbox o m -> Int
 dimension = length . shape
 
--- this is like a hyperbox whose shape is guaranteed
-data MapOfHyperboxes object morphism = MapOfHyperboxes {hZero :: Hyperbox object morphism,
-                                                        hOne :: Hyperbox object morphism,
-                                                        theMap :: Map (Delta, Epsilon) morphism}
-
 
 
 -- instance Ring morphism => Semigroup (MapOfHyperboxes object morphism) where
@@ -133,33 +217,6 @@ data MapOfHyperboxes object morphism = MapOfHyperboxes {hZero :: Hyperbox object
 -- compose as functions!
 
 
--- axis will be the axis of the NEW stuff
--- remember that axes and insertAt both start at 0
--- assumes that all parts already 'know' which axis they belng on
-mapToHyperbox :: MapOfHyperboxes o m -> Hyperbox o m
-mapToHyperbox m = Hyperbox (M.union (vertices m0) (vertices m1)) arrows''
- where
-  m0       = hZero m
-  m1       = hOne m
-  arrows'' = arrowsH m0 `M.union` arrowsH m1 `M.union` theMap m 
-
-compress :: Ring m => Hyperbox o m -> Hyperbox o m
-compress hyperbox = compose
-  (fmap (flip compressAxis) . reverse $ [0 .. dimension hyperbox - 1])
-  hyperbox
-
-compressAxis :: Ring m => Hyperbox o m -> Int -> Hyperbox o m
-compressAxis hyperbox axis =
-  fixIndices axis . mapToHyperbox . compressAlong axis $ decomposeAlongAxis hyperbox axis
- where
-    -- makes dn into 1
-  compressAlong :: Ring m => Int -> NE.NonEmpty (MapOfHyperboxes o m) -> MapOfHyperboxes o m
-  compressAlong _ ((NE.:|) h []) = h
-  compressAlong axis' hs = let hs' = reverse $ NE.toList hs
-                           in compose (fmap (composeAlong axis')  (init hs')) (last hs') -- checked length above
-  -- decomposeAlongAxis gives [first slice,second slice,...]
-  -- we reverse that into [last slice, ..., second slice, first slice]
-  -- 
 
 fixIndices :: Int -> Hyperbox o m -> Hyperbox o m
 fixIndices axis' h = h
@@ -175,28 +232,7 @@ fixIndices axis' h = h
                 . arrowsH
                 $ h
   }
-composeAlong
-  :: Ring morphism => Int
-     -> MapOfHyperboxes object morphism
-     -> MapOfHyperboxes object morphism
-     -> MapOfHyperboxes object morphism
-composeAlong axis' m' m = MapOfHyperboxes (hZero m) (hOne m') (composeDeltaEpsilonMap axis' (theMap m') (theMap m))
-
--- should compose as functions!
-composeDeltaEpsilonMap
-  :: (Ring morphism) => Int
-  -> Map (Delta, Epsilon) morphism
-  -> Map (Delta, Epsilon) morphism
-  -> Map (Delta, Epsilon) morphism
-composeDeltaEpsilonMap axis m' m = graphMap (uncurry newMorphism) . M.keys $ m
--- it is weird that m' doesn't appear directly in the definition but that's because it appears below
- where
-  newMorphism delta eps =
-    rconcat . catMaybes . fmap (ePsToMap m' m axis delta) $ decompose eps
-  decompose eps = if eps !! axis == ZZero
-                  then [] -- if eps isn't maplike then it contributes nothing
-                  else decomposeZ2Sum . replaceAt axis SumTwo . fmap singleToSum $ eps
-                                           
+                                          
   
   
   
@@ -309,10 +345,4 @@ getLastOnAxis axis h = h
   }
   where dn = shape h !! axis :: Int
 
-decomposeAlongAxis
-  :: Hyperbox object morphism
-  -> Int
-  -> NonEmpty (MapOfHyperboxes object morphism)
-decomposeAlongAxis h axis =
-   NE.fromList . reverse $ unfoldr (splitOffLastAlongAxis axis) h
-   -- this gives [first map, second map, ...]
+

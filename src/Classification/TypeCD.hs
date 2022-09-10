@@ -1,3 +1,13 @@
+{-|
+Module      : Classification.TypeCD
+Description : Helper functions for testing Type C and D configurations
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+-}
 module Classification.TypeCD
   (
   -- isC,
@@ -20,6 +30,7 @@ import           Control.Monad                  ( liftM2 )
 -- The C, D, and E classifications revolve around some kind of main circle.
 -- We call that circle primary.
 -- type D primary
+-- | Finds the sole in- and out-degree 2 component of a 'Configuration'.
 oneDegree22Circle :: Configuration -> Maybe PD
 oneDegree22Circle conf = if length counted == 1
   then Just . head $ counted
@@ -28,6 +39,7 @@ oneDegree22Circle conf = if length counted == 1
   counted = filter (\c -> indegreePD c conf == 2 && outdegreePD c conf == 2)
     $ vertexList (aGraph conf)
 
+-- | Finds the sole active circle of a 'Configuration'.
 -- type C primary
 soleCircle :: Configuration -> Maybe PD
 soleCircle c = if (vertexCount . aGraph $ c) == 1
@@ -36,7 +48,6 @@ soleCircle c = if (vertexCount . aGraph $ c) == 1
 -- hasPrimaryCircle p = isJust . p
 
 
--- FIX: this is wrong
 decsAligned
   :: Configuration -> (Configuration -> Maybe PD) -> [Decoration] -> Maybe Bool
 decsAligned conf prim (d : d' : ds) = liftM2

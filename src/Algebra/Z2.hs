@@ -1,11 +1,23 @@
+{-|
+Module      : Algebra.Z2
+Description : The Khovanov chain group
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Arithmetic over Z/2Z, the field of two elements.
+-}
 module Algebra.Z2
   (Z2(..),
   z2ToInt)
 where
 
+-- | A data type representing Z/2Z, the field with two elements.
 data Z2 = ZZero | ZOne deriving (Eq, Ord,Read,Show)
 
-
+-- | Set @negate@, @signum@, and @abs@ to @id@.
 instance Num Z2 where
     (+) ZZero x = x
     (+) x ZZero = x
@@ -20,10 +32,7 @@ instance Num Z2 where
     fromInteger 1 = ZOne
     fromInteger n = fromInteger (n `mod` 2)
 
--- instance Show Z2 where
---     show ZZero = "0"
---     show ZOne = "1"
-
+-- | @z2ToInt ZZero == 0@ and @z2ToInt ZOne == 1@.
 z2ToInt :: Z2 -> Int
 z2ToInt ZZero = 0
 z2ToInt ZOne = 1

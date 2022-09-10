@@ -1,3 +1,14 @@
+{-|
+Module      : Classification.Testing.Test
+Description : Tests for the type A, B, C, D schemes
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Sanity test for the classification scheme.  TODO: put into a proper test suite
+-}
 module Classification.Testing.Test
 where
 import Core.Configuration
@@ -8,18 +19,24 @@ import Algebra.V
 
 import Data.Set (Set)
 
+-- | Easy tests
 basicTests :: IO ()
 basicTests = sequence_ [testIsA typeA, testIsB typeB, testIsC typeC, testIsD typeD, testIsE typeE1, testIsE typeE2]
 
+-- | Same tests but returns something better
 betterBasicTests :: [Set SzabosConfigs]
 betterBasicTests = classifyConfiguration <$> [typeA, typeB, typeC, typeD, typeE1, typeE2, tricky]
 
+-- | Returns the Szabo map for each test 'Configuration'
 longTest :: [Labeling -> Set Labeling]
 longTest = szaboOneHandleMap <$>[typeA, typeB, typeC, typeD, typeE1, typeE2, tricky]
 
+-- | Larger configurations, corner cases
 trickyTest :: IO ()
 trickyTest = sequence_ [testIsA tricky, testIsB tricky, testIsC tricky, testIsD tricky, testIsE tricky]
 
+-- * Test diagrams and configurations
+-- ** Type A
 aString :: String
 aString =  ".-.-. .-.-.\n\
   \|   |>|   |\n\
@@ -30,7 +47,7 @@ aString =  ".-.-. .-.-.\n\
   \.   . .   .\n\
   \|   | |   |\n\
   \.-.-. .-.-."
-
+-- | Not Type A
 notAString :: String
 notAString = ".-.-. .-.-.\n\
              \|   |>|   |\n\
@@ -45,6 +62,7 @@ notAString = ".-.-. .-.-.\n\
 typeA :: Configuration
 typeA = fromPic aString
  
+-- ** Type B
 bString :: String
 bString = ".-. .-.\n\
           \| |>| |\n\
@@ -80,6 +98,8 @@ typeB' = fromPic bString'
 
 notB :: Configuration
 notB = fromPic notBString 
+
+-- ** Type C
 
 cString :: String
 cString = ".-.-.-.-.\n\
@@ -118,7 +138,7 @@ notCString2 = ".-.-.-.-.\n\
           \.-.-.-.-."
 
 
-
+-- ** Type D
 
 dString :: String
 dString = ".-.-.-.-.-. .-.\n\
@@ -166,6 +186,8 @@ notD1 :: Configuration
 notD1 = fromPic notDString
 notD2 :: Configuration
 notD2 = fromPic notDString2
+
+-- ** Type E
 
 typeE1 :: Configuration
 typeE1 = fromPic eString1

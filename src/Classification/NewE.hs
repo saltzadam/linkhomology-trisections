@@ -1,3 +1,14 @@
+{-|
+Module      : Classification.NewE
+Description : Tests for type E configurations
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Type E configurations are defined by studying two-dimensional subconfigurations.
+-}
 module Classification.NewE where
 
 import           Classification.Configuration
@@ -15,13 +26,14 @@ import           Algebra.Graph.AdjacencyMap.Algorithm
                                                 ( reachable )
 
 -- TODO: decide on "NewE" vs "E" etc.
-
+-- | A two-dimensional configuration.
 data TwoDConf = TwoDConf { twoDactiveCircles :: PD,
                            twoDdecos :: (Decoration,Decoration),
                            twoDcomponents :: Set Component,
                            twoDaGraph :: AdjacencyMap PD
                          } deriving (Eq, Ord, Show)
 
+-- | The active components of a 'TwoDConf'.
 twoDActiveComponents :: TwoDConf -> Int
 twoDActiveComponents =
   S.size . vertexSet . activePart . twoDConfToConf 
@@ -31,6 +43,7 @@ ruin (TwoDConf a d c g) = TwoDConf a (fmap reverseDeco d) c g -- remember that f
 
 -- TODO: is it correct that this doesn't look at p?
 
+-- | Converts a 'Configuration' into a 'TwoDConf', if possible.
 confToTwoDConf :: Configuration -> Maybe TwoDConf
 confToTwoDConf conf@(Configuration _ ds c g) = if S.size ds == 2
   then
@@ -38,11 +51,12 @@ confToTwoDConf conf@(Configuration _ ds c g) = if S.size ds == 2
     in  Just $ TwoDConf (activeCircles conf) (d1, d2) c g
   else Nothing
 
+-- | Converts a 'TwoDConf' to a 'Configuration.
 twoDConfToConf :: TwoDConf -> Configuration
 twoDConfToConf (TwoDConf pd (d1, d2) c g) =
   Configuration pd (S.fromList [d1, d2]) c g
 
-
+-- | Returns all 'TwoDConf' which use some subset of the decorations of a 'Configuration'.
 -- if initial configuration is oriented then so are the subconfigurations?  Seems like yes.
 twoDSubconfigurations :: Configuration -> [TwoDConf]
 twoDSubconfigurations (Configuration pd ds c g) = configs
@@ -61,10 +75,14 @@ twoDSubconfigurations (Configuration pd ds c g) = configs
   -- removePassives :: TwoDConf -> TwoDConf
   -- removePassives (TwoDConf actives decos') = TwoDConf actives decos'
 
+-- * Tests on two-dimensional configurations
+
+-- | Does 'TwoDConf' have type E?
 twoDE :: TwoDConf -> Bool
 twoDE c =
   or (($ c) <$> [isType23, isType4, isType5, isType67away, isType67towards])
 
+-- | Tests if a 'TwoDConf' has type 2 or 3 according to Szabo's scheme for two-dimensional configurations.
 isType23 :: TwoDConf -> Bool
 isType23 c =
   let pd       = twoDactiveCircles c
@@ -99,6 +117,7 @@ isType5 c =
 
 --away from central circle
 -- combine with case
+-- | There are two different types 6 and 7.
 isType67away :: TwoDConf -> Bool
 isType67away c =
   let

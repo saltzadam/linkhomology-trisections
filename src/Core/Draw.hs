@@ -1,3 +1,14 @@
+{-|
+Module      : Core.Draw
+Description : ASCII pictures
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Draw ASCII pictures of drawable things.
+-}
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 module Core.Draw
   ( Draw(..)
@@ -18,9 +29,11 @@ import           Core.Tangle
 
 import Algebra.Graph.AdjacencyMap
 
+-- | Like @Show@ but for pictures rather than strings.
 class Draw a where
   draw :: a -> String
 
+-- | @drawIO = putStrLn . draw@
 drawIO :: Draw a => a -> IO ()
 drawIO = putStrLn . draw
 
@@ -33,6 +46,7 @@ superImposeLine as [] = as
   
 
 -- TODO: deduplication
+-- | Superimpose one string on top of another.  E.g. @superimpose "that" "this string" = "that string"
 superImpose :: String -> String -> String
 superImpose as bs = let
   asl = lines as
@@ -47,7 +61,7 @@ superImpose as bs = let
 
                       
   
-  
+-- Superimpose a collection of drawings.   Superimposition priority goes left to right.
 dconcat :: Draw a => [a] -> String
 dconcat = superImposeFold draw
 

@@ -1,3 +1,14 @@
+{-|
+Module      : Core.Grid
+Description : The plane
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Implements our coordinate system and some geometric calculations.  The x-axis goes left to right and the y-axis goes top to bottom.  Sorry!
+-}
 {-# LANGUAGE DeriveGeneric #-}
 module Core.Grid
   ( Point(..)
@@ -25,6 +36,8 @@ import           Data.Function                  ( on )
 import           Core.Util
 import           Data.Semigroup
 import           GHC.Generics                   ( Generic )
+
+-- * Points
 --10/29: used polymorphic point
 --data Point' a = Point a a deriving (Show, Eq, Ord, Functor)
 --don't see a reason to, would rather unpack!
@@ -38,10 +51,14 @@ instance Num Point where
   fromInteger n = Point (fromInteger n) 0
   negate (Point x y) = Point (-x) (-y)
 
+-- ** Coordinate getters
+
 _x :: Point -> Int
 _x (Point x _) = x
 _y :: Point -> Int
 _y (Point _ y) = y
+
+-- ** Coordinate transformations
 
 shiftXBy :: Int -> Point -> Point
 shiftXBy k (Point x y) = Point (x + k) y
@@ -128,6 +145,7 @@ norm :: Point -> Double
 norm p =
   sqrt (fromIntegral $ _x p ^ (2 :: Int) + _y p ^ (2 :: Int) :: Double)
 
+-- | Returns the point which is farthest from the origin.  Ties go to the first element in the list.
 farthest :: [Point] -> Point
 farthest = maximumBy (compare `on` norm)
 
@@ -136,6 +154,7 @@ distance (Point x y) (Point x' y') = norm (Point (x - x') (y - y'))
 
 data ThreePointStrand = TPS Point Point Point deriving (Eq, Show)
 
+-- | For modeling the orientation of a Component.
 data Orientation = CW | CCW deriving (Eq, Show, Ord)
 opposite :: Orientation -> Orientation
 opposite CW  = CCW
@@ -174,6 +193,7 @@ checkDirection' (TPS p q r) = --trace (show p ++ show q ++ show r) $
         EQ -> error "diagonal edge somewhere in checkDirection'"
       EQ -> error "self-edge somewhere in checkDirection"
 
+-- | The data needed to draw an ASCII picture of something on a grid.  Composes by adding together the lists.
 data GridPic = GridPic {points :: [Point],
                         edges  :: [Edge],
                         edgeToEdge :: [(Edge,Edge)]
@@ -187,6 +207,8 @@ instance Semigroup GridPic where
 instance Monoid GridPic where
     mempty = GridPic [] [] []
     mappend = (<>)
+
+-- | Takes an ASCII picture and breaks it into a GridPic
 
 stringToGrid :: [[String]] -> GridPic
 stringToGrid rows = uncurry3 GridPic $ stringToGrid' 0 rows
@@ -255,6 +277,8 @@ instance Show LineColor where
     show None = "None"
     show Red = "\ESC[31mRed\ESC[0m"
 data LineType = Up' | Down' | Left' | Right' deriving Eq
+
+-- | Draws the picture
 sh' :: GridPic -> [[String]] -- NEEDS EDGES
 sh' (GridPic ps es ds) =
   let allPoints = ps ++ concat [ [p, q] | (p, q) <- es ] ++ concat

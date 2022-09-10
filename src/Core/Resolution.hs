@@ -1,9 +1,23 @@
+{-|
+Module      : Core.Resolution
+Description : Operations on Resolutions
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+A Resolution is a finite sequence of 0s and 1s.  They are used to label resolutions of planar diagrams.
+-}
 {-# LANGUAGE DeriveGeneric #-}
 module Core.Resolution
+-- TODO: export list!
 where
 import GHC.Generics (Generic)
 import Data.List (unfoldr)
 import Core.Util (deleteAtPair)
+
+-- | Another 0-1 data type.
 data Resolution' = ZeroR | OneR deriving (Eq,Ord,Generic,Show,Read)
 instance Num Resolution' where
     x + ZeroR = x
@@ -20,10 +34,23 @@ instance Num Resolution' where
     signum ZeroR = 0
     signum OneR = 1
 
+type Resolution = [Resolution']
+
+-- | The sum of the 1s in a 'Resolution'.
+weight :: Resolution -> Int
+weight (ZeroR:xs) = weight xs
+weight (OneR:xs) = 1 + weight xs
+weight [] = 0
+
+deleteResAt :: Resolution -> (Int, Int) -> Resolution
+deleteResAt = flip deleteAtPair
+
+-- | Named out of frustration.
 why :: Resolution' -> Int
 why ZeroR = 0
 why OneR = 1
 
+-- | Converts @Integral a@ to @Resolution'@.
 intToR :: Integral a => a -> Resolution'
 intToR i = if even i then ZeroR else OneR
 
@@ -38,7 +65,7 @@ hashr r = hash' 0 (fmap why r) where
 --     show ZeroR = "0"
 --     show OneR = "1"
 
-
+-- | 
 rconvert :: Int -> Resolution
 rconvert i =  rconvert' $  fmap (read . return) . toBin2 $ i
 
@@ -55,12 +82,4 @@ toBin2 = foldMap show . reverse . toBase 2
             modDiv n = let (q, r) = (n `divMod` base) in Just (r, q)
   
     
-weight :: Resolution -> Int
-weight (ZeroR:xs) = weight xs
-weight (OneR:xs) = 1 + weight xs
-weight [] = 0
-
-type Resolution = [Resolution']
-deleteResAt :: Resolution -> (Int, Int) -> Resolution
-deleteResAt = flip deleteAtPair
 

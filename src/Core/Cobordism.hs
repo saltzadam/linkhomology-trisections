@@ -1,3 +1,14 @@
+{-|
+Module      : Core.Cobordism
+Description : Simple cobordisms
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+It would be cool to build this out, but for now it's just data types for keeping track of "merges" and "splits" in the cube of resolutions, and some important helper functions.
+-}
 module Core.Cobordism
 where
 import Data.List

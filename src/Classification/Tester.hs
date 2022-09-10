@@ -1,3 +1,13 @@
+{-|
+Module      : Classification.Tester
+Description : Tests for configuration types.
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+-}
 module Classification.Tester where
 --import Classification.Classification
 --import Classification.TypeAB
@@ -21,49 +31,41 @@ import           Data.List                      (nub)
 import           Data.Semigroup
 import           Algebra.Graph.AdjacencyMap
 
-fromPic :: String -> Configuration
-fromPic =
-  orientConfig
-    . drdToConfig
-    . gridPicToDRD
-    . buildGridPic
-    . lines
+-- | Builds a configuration from a 'String'.  There are some examples in the folder @Classification/Testing/Test.hs@.
 
-checkmark :: String
-checkmark = "✓"
-notcheckmark :: String
-notcheckmark = "x"
-
+-- | Determining if a 'Configuration' has a certain type takes several steps.
+-- Each of these steps is a 'Test'.
 data Test = Test {test :: Configuration -> Bool,
                   name :: String}
 
+-- | Compose two tests with @&&@.  The names are composed by concatenating the names with a carriage return.
 instance Semigroup Test where
   (<>) t t' = Test (\c -> test t c && test t' c) (cleanTrailingReturn (name t ++ "\n" ++ name t') )
 
+-- | The "identity test" is @const True@ and has no name.
 instance Monoid Test where
   mempty = Test {test = const True,
                  name = ""}
   mappend = (<>)
 
-cleanTrailingReturn :: String -> String
-cleanTrailingReturn x = case last x of
-  '\n' -> init x
-  '\r' -> init x
-  _    -> x
-
+-- | Applys a list of tests to a 'Configuration' and prints the results.
 allTestIO :: [Test] -> Configuration -> IO ()
 ts `allTestIO` conf = putStrLn . unlines . fmap (`tests` conf) $ ts
 
 
-
+-- | @test `tests` configuration@ returns @(name test): ✓@ if @configuration@ satisfies the @test@ and @(name test): x@ otherwise.
 tests :: Test -> Configuration -> String
 t `tests` conf =
   name t ++ ": " ++ (if test t conf then checkmark else notcheckmark)
 
+-- * The tests
+-- * Type A
+-- | Test for two active circles.
 testA1 :: Test
 testA1 =
   Test {test = (2 ==) . countActiveCircles, name = "Two active circles"}
 
+-- | Test for one target circle.
 testA2 :: Test
 testA2 = Test
   { test = \c ->
@@ -77,6 +79,7 @@ testA2 = Test
   , name = "One target circle"
   }
 
+-- | Test for one passive circle.  The set @[testA1, testA2, testA3]@ is redundant.
 testA3 :: Test
 testA3 = Test
   { test = \c ->
@@ -89,19 +92,9 @@ testA3 = Test
       == 1
   , name = "One source circle"
   }
--- -- TODO: is this redundant?  cf type C and D
--- testA4 :: Test
--- testA4 = Test
---   { test = \c ->
---     let decoTargets =
---           S.fromList . catMaybes . fmap (findNode c . to) $ decoList
---         decoSources =
---           S.fromList . catMaybes . fmap (findNode c . from) $ decoList
---         decoList = S.toList $ decos c
---     in  decoTargets /= decoSources
---   , name = "Distinct source and target"
---   }
+-- * Type B
 
+-- | Test that every component has outdegree 1.
 testB1 :: Test
 testB1 = Test
   { test = \c ->
@@ -109,16 +102,20 @@ testB1 = Test
   , name = "All outdegrees are 1"
   }
 
+-- | Test that every component has indegree 1.
 testB2 :: Test
 testB2 = Test
   { test = \c -> and [ indegree com c == 1 | com <- pdComponents ( activeCircles c) ]
   , name = "All indegrees are 1"
   }
 
+-- * Type C
+-- | Test for one active circle.
 testC1 :: Test
 testC1 =
   Test {test = (== 1) . countActiveCircles, name = "One active circle"}
 
+-- | Test that there are decorations inside the active circle.
 testC2 :: Test
 testC2 = Test
   { test = \c ->
@@ -126,6 +123,7 @@ testC2 = Test
   , name = "There are inside decorations (or can't find primary circle):"
   }
 
+-- | Test that there are decorations outside the active circle.
 testC3 :: Test
 testC3 = Test
   { test = \c ->
@@ -133,6 +131,7 @@ testC3 = Test
   , name = "There are outside decorations (or can't find primary circle):"
   }
 
+-- | Test that all the inside decorations face the same way.
 testC4 :: Test
 testC4 = Test
   { test = \c ->
@@ -141,6 +140,7 @@ testC4 = Test
   , name = "Inside decorations all point the same way"
   }
 
+-- | Test that all the outside decorations face the same way.
 testC5 :: Test
 testC5 = Test
   { test = \c ->
@@ -149,6 +149,7 @@ testC5 = Test
   , name = "Outside decorations all point the same way"
   }
 
+-- | Test that the inside and outside decorations are oriented corrctly.  'testC4' and 'testC5' guarantee that we only need to verify this for one pair of decorations.
 testC6 :: Test
 testC6 = Test
   { test = \c ->
@@ -162,6 +163,7 @@ testC6 = Test
   , name = "Inside and outside decorations interlaced"
   }
 
+-- | Test that the inside and outside decorations are "interlaced," i.e. if you walk around the active circle, you see the tip/tail of alternating decorations.
 testC7 :: Test
 testC7 = Test
   { test = \c ->
@@ -203,6 +205,8 @@ testC7 = Test
 --  |     n|
 --  -------
 --  so should see m n m' n'
+
+-- | Compares the orientations from 'testC6'.  (It's better than the old @interlaced@.)  (TODO: change some names -- this is not the same sense of interlaced as 'testC7'!!)
 betterInterlaced :: Configuration -> Decoration -> Decoration -> Bool
 betterInterlaced conf (Decoration (Arc p q) (Arc p' q')) (Decoration (Arc r s) (Arc r' s')) =
   let list1 = [p,q,r,s,p',q',r',s']
@@ -210,8 +214,9 @@ betterInterlaced conf (Decoration (Arc p q) (Arc p' q')) (Decoration (Arc r s) (
   in reachables list1 (diagram conf) || reachables list2 (diagram conf)
 
 
+-- * Type D
 -- TODO: why are there 7 tests for C and 5 for D?
-
+-- | Test that all the active circles except one have in- and out-degree 1.
 testD1 :: Test
 testD1 = Test
   { test = \c ->
@@ -221,7 +226,7 @@ testD1 = Test
   , name = "All but one actives are in- and out-degree 1"
   }
 
-
+-- | Test that the circle with in- and out-degree 2 has decorations inside it.
 testD2 :: Test
 testD2 = Test
   { test = let p = oneDegree22Circle
@@ -229,6 +234,7 @@ testD2 = Test
   , name = "Has inside decorations"
   }
 
+-- | Test that the circle with in- and out-degree 2 has decorations outside it.
 testD3 :: Test
 testD3 = Test
   { test = let p = oneDegree22Circle
@@ -236,6 +242,8 @@ testD3 = Test
   , name = "Has outside decorations"
   }
 
+
+-- | Test that the decorations around the big circle are properly aligned.
 testD4 :: Test
 testD4 = Test
   { test = let p = oneDegree22Circle
@@ -250,9 +258,6 @@ testD4 = Test
                          . filter (\d -> to d `arcInPD` central)
                          $ (S.toList . decos $ c)
                  let interval1 = fst $ intervals central toCentral
-                       -- takeWhile (`notElem` toCentral)
-                       --   . dropWhile (`notElem` toCentral)
-                       --   $ S.toList central
                  let fromCentral = 
                        uncurry Decoration
                        . listToTuple
@@ -270,6 +275,8 @@ testD4 = Test
 -- symmetrize :: (Ord a) => S.Set (Node a) -> S.Set (Node a)
 -- symmetrize ns = ns `S.union` S.map flipNode ns
 
+
+-- | Test that the inside and outside decorations are "interlaced," i.e. if you walk around the active circle, you see the tip/tail of alternating decorations.
 testD5 :: Test
 testD5 = Test
   { test = let p = oneDegree22Circle
@@ -341,76 +348,36 @@ testD6 = Test
                )
   , name = "interlaced"
   }
-
-
-testC :: Test
-testC = mconcat [testC1, testC2, testC3, testC4, testC5, testC6, testC7]
--- TODO: take another look at D tests
-testD :: Test
-testD = mconcat [testD1, testD2, testD3, testD4, testD5, testD6]
-testDual :: Test -> Test
-testDual t = t { test = maybe False (test t) . dualConfiguration
-               , name = "dual: " ++ name t
-               }
+-- * Complete tests
+-- | Now we compose the various tests.  E.g. @testA = mconcat [testA1, testA2, testA3]@.
+testA :: Test
+testA = mconcat [testA1, testA2, testA3] -- testA4
 testB :: Test
 testB = Test {test = \c -> let theGraph = activePart c
                            in ((S.size . vertexSet . activePart $ c) > 1) &&  (all (== 1)) (M.elems . fmap S.size . adjacencyMap $ theGraph),
                name = "graph criterion for B"}
 
--- was testB = testDual testA
+testC :: Test
+testC = mconcat [testC1, testC2, testC3, testC4, testC5, testC6, testC7]
+testD :: Test
+testD = mconcat [testD1, testD2, testD3, testD4, testD5, testD6]
+-- TODO: take another look at D tests
 
--- this is a cute idea but it's not clear to me how to "mirror" except by testing two d configs
--- works for type B because type 1 is self-dual
--- testD :: Test
--- testD = testDual testC
-testA :: Test
-testA = mconcat [testA1, testA2, testA3] -- testA4
-
+-- | The component tests for type E has its own module, 'Classification.NewE'. 
 testE :: Test
 testE = Test
   { test = all twoDE . twoDSubconfigurations
   , name = "every twod config is of type 2 - 7"
   }
 
--- testE1' :: Test
--- testE1' = Test {test = let p = centralCircle
---                        in \c -> 
+-- | Types A and B are dual.  So are types C and D.  So you could write @testC = testDual typeD@.  Unfortunately computing dual configurations is quite slow, so this isn't practical.
+testDual :: Test -> Test
+testDual t = t { test = maybe False (test t) . dualConfiguration
+               , name = "dual: " ++ name t
+               }
 
--- testE1 :: Test
--- testE1 = Test {test = let p = centralCircle
---                       in \c -> vacuous $ allInsideOppositeDirection c p,
---                name = "all inside opposite direction"} -- SHOULD THIS ACTUALLY BE REQUIRED
-
--- testE2 :: Test
--- testE2 = Test {test = let p = centralCircle
---                       in \c -> vacuous $ allOutsideOppositeDirection c p,
---                name = "all outside opposite direction" }
-
--- testE3 :: Test
--- testE3 = Test {test = let p = centralCircle
---                       in \c -> vacuous $ compareOutsideAndInsideDirections c p,
---                name = "compare outside and inside direction" }
-
--- testE4 :: Test
--- testE4 = Test {test = let p = centralCircle
---                       in \c -> vacuous $ liftA2 (||) (allDegreeOneCirclesTowardsP c p)  (allDegreeOneCirclesAwayP c p),
---                name = "all degree one circles point towards or away"}
-
--- testE5 :: Test
--- testE5 = Test {test = let p = centralCircle
---                       in \c -> case allDegreeOneCirclesTowardsP c p of
---                         Just True -> isNothing (insideSelfDecsDir c p)
---                                      || 
---                                      ((insideSelfDecsDir c p == Just CW) && (outsideSelfDecsDir c p == Just CCW))
---                         Just False -> isNothing (insideSelfDecsDir c p)
---                                       || 
---                                       (insideSelfDecsDir c p == Just CCW) && (outsideSelfDecsDir c p == Just CW)
---                         Nothing -> (insideSelfDecsDir c p == Just CW) && (outsideSelfDecsDir c p == Just CCW)
---                                    ||
---                                    (insideSelfDecsDir c p == Just CCW) && (outsideSelfDecsDir c p == Just CW),
---                name = "compatibility of degree 1 circle decorations with inside/outside"}
-
--- classification with output
+-- ** Test and print
+-- | @testIsA configuration@ shows the output of each individual 'Test' which makes up 'testIsA'.  Very useful for testing.
 testIsA :: Configuration -> IO ()
 testIsA = allTestIO [testA1, testA2, testA3] -- testA4
 testIsB :: Configuration -> IO ()
@@ -423,5 +390,24 @@ testIsE :: Configuration -> IO ()
 --testIsE = allTestIO [testE1, testE2, testE3, testE4, testE5]
 testIsE = allTestIO [testE]
 
+-- * Pretty printing functions.
+fromPic :: String -> Configuration
+fromPic =
+  orientConfig
+    . drdToConfig
+    . gridPicToDRD
+    . buildGridPic
+    . lines
+
+checkmark :: String
+checkmark = "✓"
+notcheckmark :: String
+notcheckmark = "x"
+
+cleanTrailingReturn :: String -> String
+cleanTrailingReturn x = case last x of
+  '\n' -> init x
+  '\r' -> init x
+  _    -> x
 
 

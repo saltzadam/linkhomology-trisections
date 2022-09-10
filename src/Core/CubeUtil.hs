@@ -1,3 +1,14 @@
+{-|
+Module      : Core.CubeUtil 
+Description : Utility functions for working with cubes
+Copyright   : (c) Adam Saltz, 2020
+License     : GPL-3
+Maintainer  : saltz.adam@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Implements most of the Z/2Z arithmetic for cubes, etc.
+-}
 module Core.CubeUtil
 (addToSetMod2,
  addSetsMod2,
